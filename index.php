@@ -1,3 +1,3 @@
 <?php echo 'it`s test';?>
 
-<?php echo 'second commits';?>
+<?php echo 'second commited';>
