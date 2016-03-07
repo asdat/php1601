@@ -1,0 +1,135 @@
+<?php
+
+// функция загрузки меню
+function loadMenu(){
+	// массив нашего меню, в будущем будет взят из базы данных
+	$menu=[
+		['title'=>'Главная', 'link'=>'/', 'level'=>2],
+		['title'=>'Услуги', 'link'=>'/#intro', 'level'=>2,
+			'children'=>[
+				['title'=>'Услуга 1', 'link'=>'#one', 'level'=>2],
+				['title'=>'Услуга 2', 'link'=>'#two', 'level'=>2],
+				['title'=>'Услуга 3', 'link'=>'#three', 'level'=>2]
+			]
+		],
+		['title'=>'Новости', 'link'=>'/?page=news', 'level'=>2],
+		['title'=>'Портфолио', 'link'=>'/?page=portfolio', 'level'=>2],
+		['title'=>'Форма оплаты', 'link'=>'/?page=payform', 'level'=>1],
+		['title'=>'Контакты', 'link'=>'/?page=contacts', 'level'=>2]
+	];
+	return $menu;
+}
+
+function getMenuItem($page, $menu=false){
+	if(!$menu) $menu=loadMenu();
+	foreach($menu AS $items){
+		if($item['link']=='/?page='.$page){
+			return $item;
+		}elseif(count($item['children'])){
+			$result = getMenuItem($page, $item);
+			if($result !== null) return $result;
+		}
+	}
+}
+
+// функция загрузки информации о странице
+function loadPage($page){
+	// массив страниц, на данном этапе имеем стативный код
+	// в будущем будем извлекать из специальных шаблонов и наполнять данными из БД
+	$pages=[
+		'404'=>['title'=>'404. Страница не найдена', 'pagetitle'=>'404. Страница не найдена', 'content'=> "Страница не найдена. Возможно адрес не верный, можете начать <a href=\"/\">главной</a> страницы."],
+		'home'=>['title'=>'Главная', 'pagetitle'=>'Главная страница', 'content'=> "Все замечательно и работает на \"ура\"."],
+		'contacts'=>['title'=>'Контакты', 'content'=> ['tmpl'=>'contacts.html']],
+		'news'=>['title'=>'New', 'content'=>'<section>
+				<a href="#" class="image"><img src="images/pic02.jpg" alt="" data-position="top center" /></a>
+				<div class="content">
+					<div class="inner">
+						<h2>Feugiat consequat</h2>
+						<ul class="actions">
+							<li><a href="#" class="button">Learn more</a></li>
+						</ul>
+					</div>
+				</div>
+			</section>']
+	];
+	// выводим заголовок в зависимости от страницы, если ничего не задано, то выводим "Главная"
+	// используем сокращенную форму условного оператора и функцию проверки
+	// наличия элемента в массиве in_array($value, $array), возвращает true или false
+	// и функцию получения массива ключей массива array_keys($array), возвращает array
+	// echo in_array($_GET['page'], array_keys($pages)) ? $pages[$_GET['page']]['title'] : 'Главная';
+	// развернутый вариант условия
+	if(in_array($_GET['page'], array_keys($pages))){
+		return $pages[$_GET['page']];
+	}else{
+		return $pages['404'];
+	}
+}
+
+// объявляем функцию вывода меню
+function printMenu($menu, $level){
+	// массив классов для разных уровней иерархии
+	$classes = [0=>'menu','submenu','third-level'];
+	// начинаем формирование меню с учетом класса соответствующего текущему уровню иерархии
+	$html= "<ul class=\"{$classes[$level]}\">\n";
+	// в цикле выводим все элементы текущего уровня
+	foreach($menu AS $i=>$item){
+		// выводим конкретный текущий элемент
+		$html.="<li class='item-$i'><a href='{$item['link']}'>{$item['title']}</a>\n";
+		// проверяем есть ли дочерние элементы
+		if(count($item['children'])){
+			// выводим дочерние элементы, если они есть
+			$html.=printMenu($item['children'], $level+1);
+		}
+		// конец формирования вывода
+		$html.="</li>\n";
+	}
+	// завершаем формирование
+	$html.= '</ul>';
+	// возвращаем результат
+	return $html;
+}
+
+// показать отдельный блок
+function showBlock($blockName='', $page=false){
+	$user = getCurrUser();
+	if($blockName) require_once ( THEME_ADDR . ($page?'pages':'blocks') . DIRECTORY_SEPARATOR . $blockName . '.tmpl');
+}
+
+// загрузить всех пользователей
+function getUsers(){
+	$users=[
+		'guest' => ['title'=>'guest', 'level' => 2 ],
+		'test' => ['title'=>'test', 'pass'=>password_hash('789'), 'level'=> 1 ],
+		'admin' => ['title'=>'admin', 'pass'=>password_hash('12345'), 'level'=> 0 ],
+	];
+}
+
+function getCurrUser(){
+	$users = getUsers();
+	return (isset($_COOKIES['user']) && $_COOKIES['user']) ? getUser($_COOKIES['user']):getUser('guest');
+}
+
+// загрузить пользователя
+function getUser($user){
+	// пока случай загрузки по имени
+	if(is_string($user)){
+		$users = getUsers();
+		if(in_array($user, $users)){
+			return $users[$user];
+		}else{
+			return $users['guest'];
+		}
+	}
+}
+
+function showPage(){
+	$blocks=['menu', 'head', 'header', 'footer', 'left', 'beforepage', 'afterpage', 'news'];
+	$page=$_REQUEST['page'];
+	$page=loadPage((strlen($page)<1 || $page=='/')?'home':$page);
+	var_dump($page);
+	if(is_array($page['content'])){
+		echo showBlock($page['content']['tmpl'], true);
+	}elseif(is_string($page['content'])){
+		echo $page['content'];
+	}
+}

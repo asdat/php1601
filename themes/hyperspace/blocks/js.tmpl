@@ -1,0 +1,20 @@
+<?php
+$scripts=[
+    ['src'=>'assets/js/jquery.min.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+    ['src'=>'assets/js/jquery.scrollex.min.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+    ['src'=>'assets/js/jquery.scrolly.min.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+    ['src'=>'assets/js/skel.min.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+    ['src'=>'assets/js/util.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+    ['src'=>'assets/js/ie/respond.min.js', 'type'=>'text/javascript', 'is_hack'=>1, 'local'=>1],
+    ['src'=>'assets/js/main.js', 'type'=>'text/javascript', 'is_hack'=>0, 'local'=>1],
+];
+
+foreach($scripts AS $script){
+    if($script['is_hack']){?>
+	<!--[if lte IE 8]><script src="<?php echo $script['src'];?>" type="<?php echo $script['type'];?>"></script><![endif]-->
+    <?php
+    }else{?>
+	<script src="<?php echo $script['src'];?>" type="<?php echo $script['type'];?>"></script>
+    <?php
+    }
+}
