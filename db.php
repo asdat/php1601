@@ -1,23 +1,44 @@
 <?php
 include_once('includes/config.app');
-// подключаемся к БД
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ
 $mysqli = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-// если ошибка подключения, то выводим ее на экран
+// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 if (mysqli_connect_errno($mysqli)) {
-    echo "Не удалось подключиться к MySQL: " . mysqli_connect_error();
+    echo "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ MySQL: " . mysqli_connect_error();
 }
-// выполняем SQL запрос
-$res = mysqli_query($mysqli, "SELECT * FROM `users` WHERE 1");
-// если запрос неверный, то $res будет равно false и тогда сможем 
-if(!$res) var_dump(mysqli_error($mysqli));
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ
+//$res = mysqli_query($mysqli, "SELECT * FROM `users` WHERE 1");
+// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ $res пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ false пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
+//if(!$res) var_dump(mysqli_error($mysqli));
 
-// циклично выводим все содержимое, которое получили из БД
-// с предусловием, чтобы выполнять цикл только когда, когда есть что показать
-while($row = mysqli_fetch_assoc($res)){
-	var_dump($row);
-	echo '<br/>';
-	echo '<br/>';
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ
+// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+//while($row = mysqli_fetch_assoc($res)){
+//	var_dump($row);
+//	echo '<br/>';
+//	echo '<br/>';
+//}
+
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+$res = mysqli_query($mysqli, "SELECT * FROM `cats`");
+while($cat = mysqli_fetch_assoc($res)){
+    var_dump($cat);
+    echo '<img src="images/cats/'.$cat['image'].'" />';
 }
 
-// закрываем соединение
+$res = mysqli_query($mysqli, "SELECT * FROM `menu` WHERE parent_id = 0 AND state = 1");
+echo '<ul>';
+while($item = mysqli_fetch_assoc($res)){
+    ?>
+    <li><a href="<?php echo $item['main']?'/':$item['link'];?>" 
+            title="<?php echo $item['title'];?>">
+            <?php echo $item['title'];?>
+        </a>
+    </li>
+    <?php
+}   
+echo '</ul>';
+//'INSERT INTO users (`id`, `mod_date`) VALUES ("1", NOW())';
 mysqli_close($mysqli);
+
+include('pages/'.(in_array($_GET['page'], $pages)?$_GET['page']:'home').'.php');
