@@ -1072,6 +1072,60 @@
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
     <script>
+        var global='text';
+        function test(){
+            console.log(global);
+        }
+        console.log('555dd' == '555dd');
+        console.log(parseInt('555'));
+        console.log(parseFloat('55.5'));
+        console.log(parseInt('55dfdf5'));
+ 
+        jQuery(document).ready(function(){
+            test();
+            //
+            /*
+             * 
+             */
+            //console.log(location);
+            //console.log(document);
+            //console.log(document.forms);
+            //console.log(document.forms.sidebarForm);
+            //console.log(jQuery(document.forms.sidebarForm).children());
+            //console.log(window);
+            //console.log(jQuery(window).width());
+            jQuery('h1').on('click hover',function(){
+                test();
+                //console.log(this);
+                //console.log(jQuery(this).parent());
+                //jQuery(this).html('<br/>Test');
+                //console.log(jQuery(this).html());
+                //jQuery(this).text('<br/>Test');
+                
+                var objectData={view:'contact'};
+                console.log(objectData);
+                console.log(objectData.view);
+                jQuery.ajax({url:'ajax.php', type:'POST', data:objectData}).
+                        done(function(html){
+                    console.log(html);
+                });
+            });
+            jQuery('form[name="sidebarForm"]').submit(function(e){
+                console.log(e);
+                e.preventDefault();
+                var form = jQuery(this);
+                console.log(form.serialize());  
+                jQuery.ajax({url:'ajax.php', type:'POST', data:form.serialize()}).
+                        done(function(html){
+                    //console.log(html);
+                    //location.href=html;
+                    //form.reset();
+                });
+            });
+        });
+        
+        
+        
       $.widget.bridge('uibutton', $.ui.button);
     </script>
     <!-- Bootstrap 3.3.5 -->
